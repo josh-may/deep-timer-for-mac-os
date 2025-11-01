@@ -13,3 +13,6 @@ DerivedData/
 
 # macOS
 .DS_Store
+
+# Large audio files (too big for GitHub)
+brown-noise-1-30.mp3
