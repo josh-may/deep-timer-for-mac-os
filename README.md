@@ -83,7 +83,7 @@ Found a bug or have a feature request? [Open an issue](https://github.com/josh-m
 
 ## Author
 
-Built by [Josh May](https://github.com/josh-may)
+Built by [Josh May](https://www.jmmay.com)
 
 ---
 
