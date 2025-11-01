@@ -39,6 +39,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(item)
             menu.addItem(NSMenuItem.separator())
             menu.addItem(NSMenuItem(title: "Stop Alarm", action: #selector(stopAlarm), keyEquivalent: ""))
+        } else if timerManager.isPaused {
+            let mins = Int(timerManager.timeRemaining) / 60
+            let secs = Int(timerManager.timeRemaining) % 60
+            let item = NSMenuItem(title: String(format: "⏸️ Paused: %02d:%02d", mins, secs), action: nil, keyEquivalent: "")
+            item.isEnabled = false
+            menu.addItem(item)
+            menu.addItem(NSMenuItem.separator())
+            menu.addItem(NSMenuItem(title: "Resume Timer", action: #selector(resumeTimer), keyEquivalent: ""))
+            menu.addItem(NSMenuItem(title: "Stop Timer", action: #selector(stopTimer), keyEquivalent: ""))
         } else if timerManager.isRunning {
             let mins = Int(timerManager.timeRemaining) / 60
             let secs = Int(timerManager.timeRemaining) % 60
@@ -46,6 +55,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             item.isEnabled = false
             menu.addItem(item)
             menu.addItem(NSMenuItem.separator())
+            menu.addItem(NSMenuItem(title: "Pause Timer", action: #selector(pauseTimer), keyEquivalent: ""))
             menu.addItem(NSMenuItem(title: "Stop Timer", action: #selector(stopTimer), keyEquivalent: ""))
         } else {
             menu.addItem(createTimerMenuItem(title: "5 Seconds (Test)", seconds: 5))
@@ -99,7 +109,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func createTimerMenuItem(title: String, minutes: Int? = nil, seconds: Int? = nil) -> NSMenuItem {
-        let duration = minutes ?? (seconds! / 60)
+        let duration = minutes ?? seconds!
         let isSeconds = seconds != nil
 
         let item = NSMenuItem(title: title, action: #selector(startTimer(_:)), keyEquivalent: "")
@@ -139,6 +149,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func updateMenuBarTime(seconds: Int) {
         statusItem?.button?.title = String(format: "%02d:%02d", seconds / 60, seconds % 60)
         statusItem?.button?.image = nil
+    }
+
+    @objc func pauseTimer() {
+        brownNoisePlayer.stop()
+        timerManager.pause()
+        setupMenu()
+    }
+
+    @objc func resumeTimer() {
+        if isBrownNoiseEnabled {
+            brownNoisePlayer.play()
+        }
+        timerManager.resume()
+        setupMenu()
     }
 
     @objc func stopTimer() {
