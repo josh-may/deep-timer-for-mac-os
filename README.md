@@ -2,6 +2,8 @@
 
 A simple, elegant productivity timer that lives in your macOS menu bar.
 
+**[Learn more at jmmay.com](https://www.jmmay.com/p/deep-timer)**
+
 ## Features
 
 - ⏱️ **Quick Timer Presets** - 5 seconds (test), 30, 60, 90 minutes, and more
