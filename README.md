@@ -2,6 +2,10 @@
 
 A simple deep work / brown noise timer that lives in your macOS menu bar.
 
+<img width="186" height="235" alt="image" src="https://github.com/user-attachments/assets/8e92b68b-2c35-4094-960d-53eeb3ae6d59" />
+
+
+
 ## Features
 
 - ⏱️ **Quick Timer Presets** - 5 seconds (test), 30, 60, 90 minutes, and more
