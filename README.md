@@ -18,4 +18,4 @@ A simple deep work / brown noise timer that lives in your macOS menu bar.
 
 ## Author
 
-Built by [Josh May](https://www.jmmay.com/)
+Built by [Josh May](https://www.jmmay.com/) | [Learn more about Deep Timer](https://www.jmmay.com/p/deep-timer)
