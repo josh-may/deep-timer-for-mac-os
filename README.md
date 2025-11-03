@@ -16,7 +16,8 @@ A simple deep work / brown noise timer that lives in your macOS menu bar.
 
 **[Download Deep Timer v1.0 for macOS](https://github.com/josh-may/deep-timer-for-mac-os/releases/latest)**
 
-**Installation:** After downloading, run this in Terminal to remove the quarantine flag:
+Since this app isn't distributed through the App Store (Apple charges $99/year for code signing), you'll need to remove the quarantine flag after downloading:
+
 ```bash
 xattr -cr ~/Downloads/DeepTimer-1.0.dmg
 ```
