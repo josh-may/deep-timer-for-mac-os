@@ -16,12 +16,16 @@ A simple deep work / brown noise timer that lives in your macOS menu bar.
 
 **[Download Deep Timer v1.0 for macOS](https://github.com/josh-may/deep-timer-for-mac-os/releases/latest)**
 
-Since this app isn't distributed through the App Store (Apple charges $99/year for code signing), you'll need to remove the quarantine flag after downloading:
+**How to install:**
 
+1. Download the file
+2. Open Terminal and paste this command:
 ```bash
 xattr -cr ~/Downloads/DeepTimer-1.0.dmg
 ```
-Then open the DMG and drag to Applications.
+3. Double-click the downloaded file and drag Deep Timer to your Applications folder
+
+*Why the extra step? Apple charges $99/year to verify apps. This command tells your Mac the app is safe to open.*
 
 ## Author
 
