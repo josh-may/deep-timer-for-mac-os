@@ -30,6 +30,27 @@ xattr -dr com.apple.quarantine /Applications/DeepTimer.app
 
 *Why the extra step? The app is currently not notarized by Apple, so macOS may add a quarantine flag on first download.*
 
+**If you see: `"DeepTimer" is damaged and can’t be opened.`**
+
+Run these steps in Terminal:
+
+```bash
+rm -rf /Applications/DeepTimer.app
+xattr -cr ~/Downloads/DeepTimer-1.1.dmg
+open ~/Downloads/DeepTimer-1.1.dmg
+# Drag DeepTimer.app to /Applications
+xattr -dr com.apple.quarantine /Applications/DeepTimer.app
+open /Applications/DeepTimer.app
+```
+
+Optional integrity check:
+
+```bash
+shasum -a 256 ~/Downloads/DeepTimer-1.1.dmg
+```
+
+Compare that output to the SHA-256 value shown on the GitHub release asset.
+
 ## Author
 
 Built by [Josh May](https://www.jmmay.com/) | [Learn more about Deep Timer](https://www.jmmay.com/p/deep-timer)
