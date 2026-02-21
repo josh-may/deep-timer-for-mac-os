@@ -1,10 +1,15 @@
 #!/bin/bash
-set -e
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Configuration
 APP_NAME="DeepTimer"
-BUNDLE_ID="com.deeptimer.app"
 VERSION="1.0"
+
+DIST_DIR="$ROOT_DIR/dist"
+APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -18,7 +23,7 @@ echo ""
 
 # Step 1: Build the app
 echo -e "${GREEN}Step 1: Building app...${NC}"
-./build-app.sh
+"$SCRIPT_DIR/build-app.sh"
 
 # Step 2: Sign the app (requires Developer ID)
 echo ""
@@ -30,9 +35,9 @@ CERT_NAME=$(security find-identity -v -p codesigning | grep "Developer ID Applic
 if [ -z "$CERT_NAME" ]; then
     echo -e "${RED}⚠️  No Developer ID certificate found${NC}"
     echo "To sign the app, you need to:"
-    echo "1. Go to https://developer.apple.com"
-    echo "2. Create a free Apple Developer account"
-    echo "3. Download your Developer ID certificate"
+    echo "1. Join the Apple Developer Program"
+    echo "2. Create a Developer ID Application certificate"
+    echo "3. Install the certificate in your login keychain"
     echo ""
     echo "For now, creating unsigned build..."
     SIGNED=false
@@ -42,8 +47,8 @@ else
     # Sign the app
     codesign --force --deep --sign "$CERT_NAME" \
         --options runtime \
-        --entitlements entitlements.plist \
-        "$APP_NAME.app"
+        --entitlements "$ROOT_DIR/Packaging/entitlements.plist" \
+        "$APP_BUNDLE"
 
     echo "✅ App signed successfully"
     SIGNED=true
@@ -53,12 +58,14 @@ fi
 echo ""
 echo -e "${GREEN}Step 3: Creating DMG installer...${NC}"
 
-DMG_NAME="${APP_NAME}-${VERSION}.dmg"
+mkdir -p "$DIST_DIR"
+
+DMG_NAME="$DIST_DIR/${APP_NAME}-${VERSION}.dmg"
 rm -f "$DMG_NAME"
 
 # Create temporary folder
 TMP_DIR=$(mktemp -d)
-cp -R "$APP_NAME.app" "$TMP_DIR/"
+cp -R "$APP_BUNDLE" "$TMP_DIR/"
 
 # Create Applications symlink
 ln -s /Applications "$TMP_DIR/Applications"

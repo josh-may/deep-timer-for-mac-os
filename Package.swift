@@ -15,16 +15,8 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "DeepTimer",
-            path: ".",
-            sources: [
-                "DeepTimerApp.swift",
-                "AppDelegate.swift",
-                "TimerManager.swift",
-                "AudioPlayer.swift"
-            ],
             resources: [
-                .process("brown-noise-1-30.mp3"),
-                .process("alarm.mp3")
+                .process("Resources")
             ]
         )
     ]

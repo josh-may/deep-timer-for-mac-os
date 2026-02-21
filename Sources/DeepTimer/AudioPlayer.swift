@@ -1,0 +1,59 @@
+import AVFoundation
+
+final class AudioPlayer: NSObject {
+    private var audioPlayer: AVAudioPlayer?
+
+    init(resourceName: String) {
+        super.init()
+        setupAudio(resourceName: resourceName)
+    }
+
+    private func setupAudio(resourceName: String) {
+        guard let url = resolveAudioURL(resourceName: resourceName) else {
+            NSLog("DeepTimer: missing audio resource '%@.mp3'", resourceName)
+            return
+        }
+
+        do {
+            // AVAudioPlayer streams from disk for local URLs, preventing high memory usage for large files
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.numberOfLoops = -1 // Loop indefinitely
+            audioPlayer?.prepareToPlay()
+        } catch {
+            NSLog("DeepTimer: failed to load audio resource '%@.mp3' (%@)", resourceName, error.localizedDescription)
+        }
+    }
+
+    func play() {
+        guard let player = audioPlayer, !player.isPlaying else { return }
+        player.play()
+    }
+
+    func stop() {
+        guard let player = audioPlayer, player.isPlaying else { return }
+        player.stop()
+        player.currentTime = 0
+    }
+
+    private func resolveAudioURL(resourceName: String) -> URL? {
+        let candidateBundles = [Bundle.module, Bundle.main] + Bundle.allBundles
+        for bundle in candidateBundles {
+            if let url = bundle.url(forResource: resourceName, withExtension: "mp3") {
+                return url
+            }
+        }
+
+        if let resourcePath = Bundle.main.resourcePath {
+            let directPath = resourcePath + "/DeepTimer_DeepTimer.bundle/\(resourceName).mp3"
+            if FileManager.default.fileExists(atPath: directPath) {
+                return URL(fileURLWithPath: directPath)
+            }
+        }
+
+        return nil
+    }
+
+    deinit {
+        stop()
+    }
+}
