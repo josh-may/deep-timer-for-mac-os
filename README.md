@@ -13,14 +13,14 @@ A simple deep work / brown noise timer that lives in your macOS menu bar.
 
 ## Download
 
-**[Download the latest Deep Timer for macOS](https://github.com/josh-may/deep-timer-for-mac-os/releases/latest)**
+**[Download Deep Timer v1.1 for macOS](https://github.com/josh-may/deep-timer-for-mac-os/releases/tag/v1.1)**
 
 **How to install:**
 
-1. Download the `.dmg` from the latest release
+1. Download `DeepTimer-1.1.dmg` from the release page
 2. Open Terminal and paste this command:
 ```bash
-xattr -cr ~/Downloads/DeepTimer*.dmg
+xattr -cr ~/Downloads/DeepTimer-1.1.dmg
 ```
 3. Double-click the downloaded file and drag `DeepTimer.app` to your Applications folder
 4. If macOS still blocks first launch, run:
