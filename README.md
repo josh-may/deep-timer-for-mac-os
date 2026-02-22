@@ -11,45 +11,15 @@ A simple deep work / brown noise timer that lives in your macOS menu bar.
 - 🔊 **Optional Brown Noise** - Toggle background brown noise during focus sessions
 - 🔔 **Audio Alerts** - Get notified when your timer completes
 
-## Download
+## Install
 
-**[Download Deep Timer v1.2 for macOS](https://github.com/josh-may/deep-timer-for-mac-os/releases/tag/v1.2)**
-
-**How to install:**
-
-1. Download `DeepTimer-1.2.dmg` from the release page
-2. Open Terminal and paste this command:
-```bash
-xattr -cr ~/Downloads/DeepTimer-1.2.dmg
-```
-3. Double-click the downloaded file and drag `DeepTimer.app` to your Applications folder
-4. If macOS still blocks first launch, run:
-```bash
-xattr -dr com.apple.quarantine /Applications/DeepTimer.app
-```
-
-*Why the extra step? The app is currently not notarized by Apple, so macOS may add a quarantine flag on first download.*
-
-**If you see: `"DeepTimer" is damaged and can’t be opened.`**
-
-Run these steps in Terminal:
+Open Terminal and paste this command:
 
 ```bash
-rm -rf /Applications/DeepTimer.app
-xattr -cr ~/Downloads/DeepTimer-1.2.dmg
-open ~/Downloads/DeepTimer-1.2.dmg
-# Drag DeepTimer.app to /Applications
-xattr -dr com.apple.quarantine /Applications/DeepTimer.app
-open /Applications/DeepTimer.app
+curl -fsSL https://raw.githubusercontent.com/josh-may/deep-timer-for-mac-os/main/scripts/install.sh | bash
 ```
 
-Optional integrity check:
-
-```bash
-shasum -a 256 ~/Downloads/DeepTimer-1.2.dmg
-```
-
-Compare that output to the SHA-256 value shown on the GitHub release asset.
+This downloads, installs, and launches Deep Timer automatically.
 
 ## Author
 
