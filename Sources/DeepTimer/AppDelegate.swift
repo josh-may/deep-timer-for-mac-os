@@ -5,7 +5,7 @@ import ServiceManagement
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
     private let timerManager = TimerManager()
-    private let brownNoisePlayer = AudioPlayer(resourceName: "brown-noise-1-30")
+    private let brownNoisePlayer = BrownNoisePlayer(resourceName: "brown-noise-1-30")
     private let alarmPlayer = AudioPlayer(resourceName: "alarm")
     private var isAlarmPlaying = false
     private var isBrownNoiseEnabled: Bool {

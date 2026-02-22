@@ -2,6 +2,7 @@ import AVFoundation
 
 final class AudioPlayer: NSObject {
     private var audioPlayer: AVAudioPlayer?
+    private static let supportedExtensions = ["wav", "mp3", "m4a", "aac", "aiff"]
 
     init(resourceName: String) {
         super.init()
@@ -10,7 +11,7 @@ final class AudioPlayer: NSObject {
 
     private func setupAudio(resourceName: String) {
         guard let url = resolveAudioURL(resourceName: resourceName) else {
-            NSLog("DeepTimer: missing audio resource '%@.mp3'", resourceName)
+            NSLog("DeepTimer: missing audio resource '%@' (extensions: %@)", resourceName, Self.supportedExtensions.joined(separator: ", "))
             return
         }
 
@@ -20,7 +21,7 @@ final class AudioPlayer: NSObject {
             audioPlayer?.numberOfLoops = -1 // Loop indefinitely
             audioPlayer?.prepareToPlay()
         } catch {
-            NSLog("DeepTimer: failed to load audio resource '%@.mp3' (%@)", resourceName, error.localizedDescription)
+            NSLog("DeepTimer: failed to load audio resource '%@' (%@)", url.lastPathComponent, error.localizedDescription)
         }
     }
 
@@ -38,15 +39,19 @@ final class AudioPlayer: NSObject {
     private func resolveAudioURL(resourceName: String) -> URL? {
         let candidateBundles = [Bundle.module, Bundle.main] + Bundle.allBundles
         for bundle in candidateBundles {
-            if let url = bundle.url(forResource: resourceName, withExtension: "mp3") {
-                return url
+            for fileExtension in Self.supportedExtensions {
+                if let url = bundle.url(forResource: resourceName, withExtension: fileExtension) {
+                    return url
+                }
             }
         }
 
         if let resourcePath = Bundle.main.resourcePath {
-            let directPath = resourcePath + "/DeepTimer_DeepTimer.bundle/\(resourceName).mp3"
-            if FileManager.default.fileExists(atPath: directPath) {
-                return URL(fileURLWithPath: directPath)
+            for fileExtension in Self.supportedExtensions {
+                let directPath = resourcePath + "/DeepTimer_DeepTimer.bundle/\(resourceName).\(fileExtension)"
+                if FileManager.default.fileExists(atPath: directPath) {
+                    return URL(fileURLWithPath: directPath)
+                }
             }
         }
 
