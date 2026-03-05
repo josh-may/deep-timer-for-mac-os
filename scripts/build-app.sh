@@ -35,6 +35,10 @@ else
     echo "⚠️  Resource bundle not found"
 fi
 
+# Ad-hoc sign the entire bundle so macOS treats it as a valid app
+echo "🔏 Signing app bundle..."
+codesign --force --deep -s - "$APP_BUNDLE"
+
 echo "✅ Done! App created at: $APP_BUNDLE"
 echo ""
 echo "To run:"
