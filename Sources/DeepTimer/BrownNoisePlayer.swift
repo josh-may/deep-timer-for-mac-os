@@ -120,25 +120,7 @@ final class BrownNoisePlayer {
     }
 
     private func resolveAudioURL(resourceName: String) -> URL? {
-        let candidateBundles = [Bundle.module, Bundle.main] + Bundle.allBundles
-        for bundle in candidateBundles {
-            for fileExtension in Self.supportedExtensions {
-                if let url = bundle.url(forResource: resourceName, withExtension: fileExtension) {
-                    return url
-                }
-            }
-        }
-
-        if let resourcePath = Bundle.main.resourcePath {
-            for fileExtension in Self.supportedExtensions {
-                let directPath = resourcePath + "/DeepTimer_DeepTimer.bundle/\(resourceName).\(fileExtension)"
-                if FileManager.default.fileExists(atPath: directPath) {
-                    return URL(fileURLWithPath: directPath)
-                }
-            }
-        }
-
-        return nil
+        AppResources.audioURL(named: resourceName, supportedExtensions: Self.supportedExtensions)
     }
 
     private func extractSamples(from buffer: AVAudioPCMBuffer, channels: Int, frames: Int) -> [[Float]] {

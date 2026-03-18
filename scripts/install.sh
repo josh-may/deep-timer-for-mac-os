@@ -2,36 +2,66 @@
 set -euo pipefail
 
 APP_NAME="DeepTimer"
-DMG_NAME="DeepTimer-1.2.dmg"
-DMG_URL="https://github.com/josh-may/deep-timer-for-mac-os/releases/download/v1.2/$DMG_NAME"
-MOUNT_POINT="/Volumes/$APP_NAME"
 INSTALL_DIR="/Applications"
-TMP_DMG="/tmp/$DMG_NAME"
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." 2>/dev/null && pwd || true)"
+BUILD_ROOT=""
+TEMP_ROOT=""
 
-echo "Installing $APP_NAME..."
+find_repo_root() {
+  local dir="${1:-$PWD}"
 
-# Kill if running
-pkill -x "$APP_NAME" 2>/dev/null || true
+  while [ "$dir" != "/" ]; do
+    if [ -f "$dir/Package.swift" ] && [ -x "$dir/scripts/build-app.sh" ]; then
+      printf '%s\n' "$dir"
+      return 0
+    fi
 
-# Download
-echo "Downloading $APP_NAME..."
-curl -fsSL -o "$TMP_DMG" "$DMG_URL"
+    dir="$(dirname "$dir")"
+  done
 
-# Mount
-echo "Mounting disk image..."
-hdiutil attach "$TMP_DMG" -nobrowse -quiet
+  return 1
+}
 
-# Copy to Applications
+cleanup() {
+  if [ -n "$TEMP_ROOT" ] && [ -d "$TEMP_ROOT" ]; then
+    rm -rf "$TEMP_ROOT"
+  fi
+}
+
+trap cleanup EXIT
+
+if [ -n "$SCRIPT_ROOT" ] && [ -f "$SCRIPT_ROOT/Package.swift" ] && [ -x "$SCRIPT_ROOT/scripts/build-app.sh" ]; then
+  BUILD_ROOT="$SCRIPT_ROOT"
+elif BUILD_ROOT="$(find_repo_root "$PWD")"; then
+  :
+else
+  TEMP_ROOT="$(mktemp -d)"
+  ARCHIVE_PATH="$TEMP_ROOT/deep-timer-main.tar.gz"
+
+  echo "Downloading latest source..."
+  curl -fsSL -o "$ARCHIVE_PATH" "https://github.com/josh-may/deep-timer-for-mac-os/archive/refs/heads/main.tar.gz"
+
+  echo "Extracting source..."
+  tar -xzf "$ARCHIVE_PATH" -C "$TEMP_ROOT"
+  BUILD_ROOT="$(find "$TEMP_ROOT" -mindepth 1 -maxdepth 1 -type d -name 'deep-timer-for-mac-os-*' -print -quit)"
+
+  if [ -z "$BUILD_ROOT" ]; then
+    echo "Failed to locate extracted source directory." >&2
+    exit 1
+  fi
+fi
+
+echo "Building $APP_NAME..."
+bash "$BUILD_ROOT/scripts/build-app.sh"
+
 echo "Installing to $INSTALL_DIR..."
+pkill -x "$APP_NAME" 2>/dev/null || true
 rm -rf "$INSTALL_DIR/$APP_NAME.app"
-cp -R "$MOUNT_POINT/$APP_NAME.app" "$INSTALL_DIR/"
+cp -R "$BUILD_ROOT/dist/$APP_NAME.app" "$INSTALL_DIR/"
 
-# Unmount and clean up
-hdiutil detach "$MOUNT_POINT" -quiet
-rm -f "$TMP_DMG"
-
-# Strip quarantine/provenance flags so macOS doesn't block the app after restart
+echo "Finalizing app bundle..."
 xattr -cr "$INSTALL_DIR/$APP_NAME.app"
+codesign --force --deep -s - "$INSTALL_DIR/$APP_NAME.app"
 
 echo "Launching $APP_NAME..."
 open "$INSTALL_DIR/$APP_NAME.app"

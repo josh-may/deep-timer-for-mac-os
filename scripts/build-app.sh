@@ -9,7 +9,13 @@ DIST_DIR="$ROOT_DIR/dist"
 APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
 APP_DIR="$APP_BUNDLE/Contents/MacOS"
 RESOURCES_DIR="$APP_BUNDLE/Contents/Resources"
-SPM_BUILD_DIR="$ROOT_DIR/.build/spm-release"
+SPM_BUILD_DIR="$(mktemp -d "${TMPDIR:-/tmp}/deeptimer-spm-release.XXXXXX")"
+
+cleanup() {
+    rm -rf "$SPM_BUILD_DIR"
+}
+
+trap cleanup EXIT
 
 echo "🔨 Building Deep Timer..."
 swift build -c release --scratch-path "$SPM_BUILD_DIR"
@@ -25,7 +31,7 @@ cp "$BIN_DIR/$APP_NAME" "$APP_DIR/"
 cp "$ROOT_DIR/Packaging/Info.plist" "$APP_BUNDLE/Contents/"
 cp "$ROOT_DIR/Packaging/AppIcon.icns" "$RESOURCES_DIR/"
 
-# Copy resource bundle
+# Copy resource bundle.
 RESOURCE_BUNDLE="$(find "$BIN_DIR" -maxdepth 1 -type d -name "${APP_NAME}_${APP_NAME}.bundle" -print -quit)"
 
 if [ -n "$RESOURCE_BUNDLE" ]; then
