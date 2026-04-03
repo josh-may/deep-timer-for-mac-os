@@ -272,23 +272,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Stopwatch Actions
 
     @objc private func startStopwatch() {
+        if isBrownNoiseEnabled {
+            brownNoisePlayer.play()
+        }
         stopwatchManager.start()
         showStopwatchTime()
         setupMenu()
     }
 
     @objc private func stopStopwatch() {
+        brownNoisePlayer.stop()
         stopwatchManager.stop()
         setupMenu()
     }
 
     @objc private func resumeStopwatch() {
+        if isBrownNoiseEnabled {
+            brownNoisePlayer.play()
+        }
         stopwatchManager.resume()
         showStopwatchTime()
         setupMenu()
     }
 
     @objc private func resetStopwatch() {
+        brownNoisePlayer.stop()
         stopwatchManager.reset()
         showDefaultStatusIcon()
         setupMenu()
