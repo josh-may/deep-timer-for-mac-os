@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct DeepTimerApp: App {
+struct DeepClockApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
