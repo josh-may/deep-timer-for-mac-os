@@ -53,7 +53,7 @@ final class TimerManager {
         // Use common run loop modes so the timer keeps running while menu tracking is active.
         RunLoop.main.add(newTimer, forMode: .common)
     }
-    
+
     private func invalidateTimer() {
         timer?.invalidate()
         timer = nil

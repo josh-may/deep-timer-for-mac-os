@@ -1,6 +1,5 @@
 import AppKit
 import UserNotifications
-import ServiceManagement
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
@@ -128,7 +127,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(makeActionMenuItem(title: "Stop Alarm", action: #selector(stopAlarm)))
     }
 
-    // MARK: - Settings
+    // MARK: - Audio Menu
 
     private func buildAudioMenu(_ menu: NSMenu) {
         let audioSubmenu = NSMenu()
@@ -144,33 +143,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let audioItem = NSMenuItem(title: "Audio", action: nil, keyEquivalent: "")
         audioItem.submenu = audioSubmenu
         menu.addItem(audioItem)
-    }
-
-    private func buildSettingsMenu(_ menu: NSMenu) {
-        let settingsSubmenu = NSMenu()
-
-        // More Times
-        let moreTimesSubmenu = NSMenu()
-        for mins in stride(from: 5, through: 120, by: 5) {
-            moreTimesSubmenu.addItem(createTimerMenuItem(title: "\(mins) Minutes", seconds: mins * 60))
-        }
-        let moreTimesItem = NSMenuItem(title: "More times", action: nil, keyEquivalent: "")
-        moreTimesItem.submenu = moreTimesSubmenu
-        settingsSubmenu.addItem(moreTimesItem)
-
-        settingsSubmenu.addItem(NSMenuItem.separator())
-
-        let launchAtLoginItem = makeActionMenuItem(title: "Launch at Login", action: #selector(toggleLaunchAtLogin))
-        launchAtLoginItem.state = launchAtLoginMenuState()
-        settingsSubmenu.addItem(launchAtLoginItem)
-
-        if #available(macOS 13.0, *), SMAppService.mainApp.status == .requiresApproval {
-            settingsSubmenu.addItem(makeActionMenuItem(title: "Open Login Items Settings…", action: #selector(openLoginItemsSettings)))
-        }
-
-        let settingsItem = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")
-        settingsItem.submenu = settingsSubmenu
-        menu.addItem(settingsItem)
     }
 
     // MARK: - Menu Helpers
@@ -190,26 +162,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Formatting
 
     private func formattedTimerStatus(paused: Bool) -> String {
-        let mins = Int(timerManager.timeRemaining) / 60
-        let secs = Int(timerManager.timeRemaining) % 60
+        let time = formattedDuration(timerManager.timeRemaining)
         return paused
-            ? String(format: "⏸️ Paused: %02d:%02d", mins, secs)
-            : String(format: "Time Remaining: %02d:%02d", mins, secs)
+            ? "⏸️ Paused: \(time)"
+            : "Time Remaining: \(time)"
     }
 
     private func formattedStopwatch() -> String {
-        let total = Int(stopwatchManager.elapsedTime)
-        let hrs = total / 3600
-        let mins = (total % 3600) / 60
-        let secs = total % 60
-        if hrs > 0 {
-            return String(format: "%d:%02d:%02d", hrs, mins, secs)
-        }
-        return String(format: "%02d:%02d", mins, secs)
+        formattedDuration(stopwatchManager.elapsedTime)
     }
 
-    private func formattedStopwatchMenuBar() -> String {
-        let total = Int(stopwatchManager.elapsedTime)
+    private func formattedDuration(_ interval: TimeInterval) -> String {
+        let total = Int(interval)
         let hrs = total / 3600
         let mins = (total % 3600) / 60
         let secs = total % 60
@@ -238,12 +202,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showCountdown(seconds: Int) {
-        statusItem?.button?.title = String(format: "%02d:%02d", seconds / 60, seconds % 60)
+        statusItem?.button?.title = formattedDuration(TimeInterval(seconds))
         statusItem?.button?.image = nil
     }
 
     private func showStopwatchTime() {
-        statusItem?.button?.title = formattedStopwatchMenuBar()
+        statusItem?.button?.title = formattedStopwatch()
         statusItem?.button?.image = nil
     }
 
@@ -271,7 +235,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func stopStopwatch() {
         brownNoisePlayer.stop()
-        stopwatchManager.stop()
+        stopwatchManager.pause()
         setupMenu()
     }
 
@@ -364,92 +328,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func setSilent() {
         isBrownNoiseEnabled = false
         setupMenu()
-    }
-
-    // MARK: - Launch at Login
-
-    private func isAppInApplicationsFolder() -> Bool {
-        let path = Bundle.main.bundlePath
-        return path.hasPrefix("/Applications/") || path.hasPrefix(NSHomeDirectory() + "/Applications/")
-    }
-
-    @objc private func toggleLaunchAtLogin() {
-        if #available(macOS 13.0, *) {
-            if !isAppInApplicationsFolder() {
-                showMoveToApplicationsAlert()
-                return
-            }
-
-            let service = SMAppService.mainApp
-            do {
-                switch service.status {
-                case .enabled, .requiresApproval:
-                    try service.unregister()
-                case .notFound:
-                    showMoveToApplicationsAlert()
-                case .notRegistered:
-                    try service.register()
-                    showLaunchAtLoginSuccessAlert()
-                @unknown default:
-                    try service.register()
-                }
-            } catch {
-                showLaunchAtLoginErrorAlert(error)
-            }
-        }
-        setupMenu()
-    }
-
-    private func launchAtLoginMenuState() -> NSControl.StateValue {
-        if #available(macOS 13.0, *) {
-            switch SMAppService.mainApp.status {
-            case .enabled:
-                return .on
-            case .requiresApproval:
-                return .mixed
-            case .notFound, .notRegistered:
-                return .off
-            @unknown default:
-                return .off
-            }
-        }
-        return .off
-    }
-
-    @objc private func openLoginItemsSettings() {
-        if #available(macOS 13.0, *) {
-            SMAppService.openSystemSettingsLoginItems()
-        }
-    }
-
-    private func showLaunchAtLoginSuccessAlert() {
-        let alert = NSAlert()
-        alert.messageText = "Launch at Login Enabled"
-        alert.informativeText = "Deep Timer will open automatically when you log in.\n\nIf it doesn't work, verify it's enabled in System Settings → General → Login Items."
-        alert.addButton(withTitle: "Open Login Items Settings")
-        alert.addButton(withTitle: "OK")
-        if alert.runModal() == .alertFirstButtonReturn {
-            openLoginItemsSettings()
-        }
-    }
-
-    private func showMoveToApplicationsAlert() {
-        let alert = NSAlert()
-        alert.messageText = "Move to Applications"
-        alert.informativeText = "To enable Launch at Login, move this app to the Applications folder and reopen it."
-        alert.addButton(withTitle: "Show in Finder")
-        alert.addButton(withTitle: "Cancel")
-        if alert.runModal() == .alertFirstButtonReturn {
-            NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: "/Applications")
-        }
-    }
-
-    private func showLaunchAtLoginErrorAlert(_ error: Error) {
-        let alert = NSAlert()
-        alert.messageText = "Failed to update Launch at Login"
-        alert.informativeText = "An error occurred: \(error.localizedDescription)"
-        alert.addButton(withTitle: "OK")
-        alert.runModal()
     }
 
     // MARK: - Quit

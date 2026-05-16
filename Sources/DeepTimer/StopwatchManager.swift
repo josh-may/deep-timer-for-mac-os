@@ -16,13 +16,14 @@ final class StopwatchManager {
         scheduleTimer()
     }
 
-    func stop() {
-        guard isRunning || isPaused else { return }
-        accumulatedTime += Date().timeIntervalSince(startDate ?? Date())
+    func pause() {
+        guard isRunning, let start = startDate else { return }
+        accumulatedTime += Date().timeIntervalSince(start)
         elapsedTime = accumulatedTime
+        startDate = nil
         invalidateTimer()
-        isPaused = true
         isRunning = false
+        isPaused = true
     }
 
     func resume() {
