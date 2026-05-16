@@ -7,11 +7,11 @@
     <key>CFBundleExecutable</key>
     <string>DeepTimer</string>
     <key>CFBundleIdentifier</key>
-    <string>com.deepclock.app</string>
+    <string>com.deeptimer.app</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>Deep Clock</string>
+    <string>Deep Timer</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -29,7 +29,7 @@
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
     <key>CFBundleDisplayName</key>
-    <string>Deep Clock</string>
+    <string>Deep Timer</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>LSApplicationCategoryType</key>

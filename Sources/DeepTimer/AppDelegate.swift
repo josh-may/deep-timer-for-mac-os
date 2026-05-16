@@ -425,7 +425,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func showLaunchAtLoginSuccessAlert() {
         let alert = NSAlert()
         alert.messageText = "Launch at Login Enabled"
-        alert.informativeText = "Deep Clock will open automatically when you log in.\n\nIf it doesn't work, verify it's enabled in System Settings → General → Login Items."
+        alert.informativeText = "Deep Timer will open automatically when you log in.\n\nIf it doesn't work, verify it's enabled in System Settings → General → Login Items."
         alert.addButton(withTitle: "Open Login Items Settings")
         alert.addButton(withTitle: "OK")
         if alert.runModal() == .alertFirstButtonReturn {

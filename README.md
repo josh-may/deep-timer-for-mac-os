@@ -1,4 +1,4 @@
-# Deep Clock for macOS
+# Deep Timer for macOS
 
 A simple deep work / brown noise clock that lives in your macOS menu bar.
 
@@ -20,8 +20,8 @@ Open Terminal and paste this command:
 curl -fsSL https://raw.githubusercontent.com/josh-may/deep-timer-for-mac-os/main/scripts/install.sh | bash
 ```
 
-This downloads, installs, and launches Deep Clock automatically.
+This downloads, installs, and launches Deep Timer automatically.
 
 ## Author
 
-Built by [Josh May](https://www.jmmay.com/) | [Learn more about Deep Clock](https://www.jmmay.com/p/deep-timer)
+Built by [Josh May](https://www.jmmay.com/) | [Learn more about Deep Timer](https://www.jmmay.com/p/deep-timer)

@@ -5,12 +5,12 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 BUILD_NAME="DeepTimer"
-APP_NAME="DeepClock"
+APP_NAME="DeepTimer"
 DIST_DIR="$ROOT_DIR/dist"
 APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
 APP_DIR="$APP_BUNDLE/Contents/MacOS"
 RESOURCES_DIR="$APP_BUNDLE/Contents/Resources"
-SPM_BUILD_DIR="$(mktemp -d "${TMPDIR:-/tmp}/deepclock-spm-release.XXXXXX")"
+SPM_BUILD_DIR="$(mktemp -d "${TMPDIR:-/tmp}/deeptimer-spm-release.XXXXXX")"
 
 cleanup() {
     rm -rf "$SPM_BUILD_DIR"
@@ -18,7 +18,7 @@ cleanup() {
 
 trap cleanup EXIT
 
-echo "🔨 Building Deep Clock..."
+echo "🔨 Building Deep Timer..."
 swift build -c release --scratch-path "$SPM_BUILD_DIR"
 BIN_DIR="$(swift build -c release --show-bin-path --scratch-path "$SPM_BUILD_DIR")"
 
