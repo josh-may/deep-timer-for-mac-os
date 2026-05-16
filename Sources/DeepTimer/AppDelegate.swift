@@ -51,7 +51,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         menu.addItem(NSMenuItem.separator())
-        buildSettingsMenu(menu)
+        buildAudioMenu(menu)
         menu.addItem(makeActionMenuItem(title: "Quit", action: #selector(quit), keyEquivalent: "q"))
 
         statusItem?.menu = menu
@@ -60,24 +60,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Stopwatch Section
 
     private func buildStopwatchSection(_ menu: NSMenu) {
-        let header = NSMenuItem(title: "Stopwatch", action: nil, keyEquivalent: "")
-        header.isEnabled = false
-        menu.addItem(header)
-
         if stopwatchManager.isRunning {
-            let statusItem = NSMenuItem(title: formattedStopwatch(), action: nil, keyEquivalent: "")
+            let statusItem = NSMenuItem(title: "Stopwatch: " + formattedStopwatch(), action: nil, keyEquivalent: "")
             statusItem.tag = Constants.MenuTags.stopwatchStatusItem
             statusItem.isEnabled = false
             menu.addItem(statusItem)
-            menu.addItem(makeActionMenuItem(title: "Stop", action: #selector(stopStopwatch)))
-            menu.addItem(makeActionMenuItem(title: "Reset", action: #selector(resetStopwatch)))
+            menu.addItem(makeActionMenuItem(title: "Stop Stopwatch", action: #selector(stopStopwatch)))
+            menu.addItem(makeActionMenuItem(title: "Reset Stopwatch", action: #selector(resetStopwatch)))
         } else if stopwatchManager.isPaused {
             let statusItem = NSMenuItem(title: "⏸️ " + formattedStopwatch(), action: nil, keyEquivalent: "")
             statusItem.tag = Constants.MenuTags.stopwatchStatusItem
             statusItem.isEnabled = false
             menu.addItem(statusItem)
-            menu.addItem(makeActionMenuItem(title: "Resume", action: #selector(resumeStopwatch)))
-            menu.addItem(makeActionMenuItem(title: "Reset", action: #selector(resetStopwatch)))
+            menu.addItem(makeActionMenuItem(title: "Resume Stopwatch", action: #selector(resumeStopwatch)))
+            menu.addItem(makeActionMenuItem(title: "Reset Stopwatch", action: #selector(resetStopwatch)))
         } else {
             menu.addItem(makeActionMenuItem(title: "Start", action: #selector(startStopwatch)))
         }
@@ -86,10 +82,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Timers Section
 
     private func buildTimersSection(_ menu: NSMenu) {
-        let header = NSMenuItem(title: "Timers", action: nil, keyEquivalent: "")
-        header.isEnabled = false
-        menu.addItem(header)
-
         // Disable timer presets while stopwatch is active
         let stopwatchActive = stopwatchManager.isRunning || stopwatchManager.isPaused
 
@@ -112,8 +104,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Running Timer Section
 
     private func buildRunningTimerSection(_ menu: NSMenu) {
-        let statusText = formattedTimerStatus(paused: timerManager.isPaused)
-        let item = NSMenuItem(title: statusText, action: nil, keyEquivalent: "")
+        let item = NSMenuItem(title: formattedTimerStatus(paused: timerManager.isPaused), action: nil, keyEquivalent: "")
         item.tag = Constants.MenuTags.timerStatusItem
         item.isEnabled = false
         menu.addItem(item)
@@ -139,22 +130,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Settings
 
-    private func buildSettingsMenu(_ menu: NSMenu) {
-        let settingsSubmenu = NSMenu()
-
-        // 5 Sec Test
-        settingsSubmenu.addItem(createTimerMenuItem(title: "5 Sec test", seconds: 5))
-
-        // More Times
-        let moreTimesSubmenu = NSMenu()
-        for mins in stride(from: 5, through: 120, by: 5) {
-            moreTimesSubmenu.addItem(createTimerMenuItem(title: "\(mins) Minutes", seconds: mins * 60))
-        }
-        let moreTimesItem = NSMenuItem(title: "More times", action: nil, keyEquivalent: "")
-        moreTimesItem.submenu = moreTimesSubmenu
-        settingsSubmenu.addItem(moreTimesItem)
-
-        // Audio Mode
+    private func buildAudioMenu(_ menu: NSMenu) {
         let audioSubmenu = NSMenu()
 
         let brownNoiseItem = makeActionMenuItem(title: "Brown Noise", action: #selector(setBrownNoise))
@@ -165,9 +141,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         silentItem.state = isBrownNoiseEnabled ? .off : .on
         audioSubmenu.addItem(silentItem)
 
-        let audioModeItem = NSMenuItem(title: "Audio mode", action: nil, keyEquivalent: "")
-        audioModeItem.submenu = audioSubmenu
-        settingsSubmenu.addItem(audioModeItem)
+        let audioItem = NSMenuItem(title: "Audio", action: nil, keyEquivalent: "")
+        audioItem.submenu = audioSubmenu
+        menu.addItem(audioItem)
+    }
+
+    private func buildSettingsMenu(_ menu: NSMenu) {
+        let settingsSubmenu = NSMenu()
+
+        // More Times
+        let moreTimesSubmenu = NSMenu()
+        for mins in stride(from: 5, through: 120, by: 5) {
+            moreTimesSubmenu.addItem(createTimerMenuItem(title: "\(mins) Minutes", seconds: mins * 60))
+        }
+        let moreTimesItem = NSMenuItem(title: "More times", action: nil, keyEquivalent: "")
+        moreTimesItem.submenu = moreTimesSubmenu
+        settingsSubmenu.addItem(moreTimesItem)
 
         settingsSubmenu.addItem(NSMenuItem.separator())
 
